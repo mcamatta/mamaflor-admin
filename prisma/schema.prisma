@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client"
+  output     = "../src/generated/prisma"
+}
+datasource db {
+  provider = "postgresql"
+}
+model account {
+  id                    String    @id
+  issuer                String
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+  user                  user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([issuer, accountId])
+}
+
+model session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model user {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+  account       account[]
+  session       session[]
+}
+
+model verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+}
+
+enum PessoaStatus {
+  EM_DIA
+  PRE_ASSOCIADO
+  DOCUMENTACAO_OK
+  ATENCAO
+  ISENTO
+  SAIU
+}
+
+enum PessoaTipo {
+  HUMANO
+  PET
+}
+
+enum PessoaSexo {
+  M
+  F
+  OUTRO
+}
+
+enum DocumentoTipo {
+  FICHA_FILIACAO
+  RG_CPF
+  COMP_RESIDENCIA
+  RECEITA_MEDICA
+  LAUDO
+}
+
+enum ProdutoTipo {
+  OLEO
+  POMADA
+  RESINA
+  RESGATE
+  SUPOSITORIO
+  FLORES
+}
+
+enum OleoPerfil {
+  FULL_SPECTRUM
+  BROAD_SPECTRUM
+  ISOLADO
+}
+
+enum OleoVolume {
+  ML_10
+  ML_30
+}
+
+model Pessoa {
+  id                 Int       @id @default(autoincrement())
+  status             PessoaStatus @default(EM_DIA)
+  tipo               PessoaTipo   @default(HUMANO)
+  cpf                String?
+  nascimento         DateTime? @db.Date
+  nome               String
+  sexo               PessoaSexo?
+  email              String?
+  telefone           String?
+  cep                String?
+  rua                String?
+  numero             String?
+  complemento        String?
+  bairro             String?
+  cidade             String?
+  uf                 String?   @db.VarChar(2)
+  possuiResponsavel  Boolean   @default(false)
+  responsavelNome    String?
+  responsavelCpf     String?
+  validadeReceita    DateTime? @db.Date
+  pastaFisica        Boolean   @default(false)
+  pastaVirtualUrl    String?
+  condicaoSaude      String?
+  prescritor         String?
+  valorTaxa          Decimal?  @db.Decimal(10, 2)
+  observacoes        String?
+  inactivatedAt      DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  documentos         PessoaDocumento[]
+  produtos           PessoaProduto[]
+  pagamentos         PessoaPagamento[]
+  pedidos            PessoaPedido[]
+
+  @@index([inactivatedAt])
+  @@index([nome])
+  @@index([cpf])
+  @@map("pessoa")
+}
+
+model PessoaDocumento {
+  id       Int           @id @default(autoincrement())
+  pessoaId Int
+  tipo     DocumentoTipo
+  presente Boolean
+  pessoa   Pessoa        @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
+
+  @@unique([pessoaId, tipo])
+  @@map("pessoa_documento")
+}
+
+model PessoaProduto {
+  id       Int         @id @default(autoincrement())
+  pessoaId Int
+  tipo     ProdutoTipo
+  perfil   OleoPerfil?
+  diluicao Decimal?
+  volume   OleoVolume?
+  pessoa   Pessoa      @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
+
+  @@map("pessoa_produto")
+}
+
+model PessoaPagamento {
+  id          Int       @id @default(autoincrement())
+  pessoaId    Int
+  competencia String
+  valor       Decimal?  @db.Decimal(10, 2)
+  pagoEm      DateTime?
+  pessoa      Pessoa    @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
+
+  @@unique([pessoaId, competencia])
+  @@map("pessoa_pagamento")
+}
+
+model PessoaPedido {
+  id         Int      @id @default(autoincrement())
+  pessoaId   Int
+  descricao  String
+  createdAt  DateTime @default(now())
+  pessoa     Pessoa   @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
+
+  @@map("pessoa_pedido")
+}
