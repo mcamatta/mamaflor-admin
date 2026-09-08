@@ -20,21 +20,15 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Valores só para o build: prisma generate e o carregamento de lib/prisma.ts
-# exigem as variáveis presentes. Segredos reais entram em runtime.
-ARG DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:5432/postgres"
-ARG DIRECT_URL="postgresql://postgres:postgres@127.0.0.1:5432/postgres"
-ARG BETTER_AUTH_SECRET="build-placeholder"
-ARG BETTER_AUTH_URL="http://localhost:3000"
-ARG ALLOW_PUBLIC_SIGN_UP="false"
-
+# Placeholders só para o build (prisma generate / import de lib/prisma.ts).
+# Segredos reais entram em runtime na Had Cloud, não como ARG.
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV DATABASE_URL=${DATABASE_URL}
-ENV DIRECT_URL=${DIRECT_URL}
-ENV BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
-ENV BETTER_AUTH_URL=${BETTER_AUTH_URL}
-ENV ALLOW_PUBLIC_SIGN_UP=${ALLOW_PUBLIC_SIGN_UP}
+ENV DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:5432/postgres"
+ENV DIRECT_URL="postgresql://postgres:postgres@127.0.0.1:5432/postgres"
+ENV BETTER_AUTH_SECRET="build-placeholder"
+ENV BETTER_AUTH_URL="http://localhost:3000"
+ENV ALLOW_PUBLIC_SIGN_UP="false"
 
 RUN npm run build
 
