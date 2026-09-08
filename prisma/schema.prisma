@@ -26,15 +26,16 @@ model account {
 }
 
 model session {
-  id        String   @id
-  expiresAt DateTime
-  token     String   @unique
-  createdAt DateTime
-  updatedAt DateTime
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String   @id
+  expiresAt      DateTime
+  token          String   @unique
+  createdAt      DateTime
+  updatedAt      DateTime
+  ipAddress      String?
+  userAgent      String?
+  impersonatedBy String?
+  userId         String
+  user           user     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model user {
@@ -43,6 +44,10 @@ model user {
   email         String    @unique
   emailVerified Boolean
   image         String?
+  role          String    @default("admin")
+  banned        Boolean   @default(false)
+  banReason     String?
+  banExpires    DateTime?
   createdAt     DateTime
   updatedAt     DateTime
   account       account[]
