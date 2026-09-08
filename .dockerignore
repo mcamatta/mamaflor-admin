@@ -1,0 +1,71 @@
+############################################################
+# Mantém o contexto do Docker pequeno e sem segredos.
+############################################################
+
+# Dependências (instaladas dentro da imagem)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Artefatos de build
+.next/
+out/
+dist/
+build/
+.vercel/
+src/generated/
+
+# Testes
+coverage/
+*.test.*
+*.spec.*
+
+# Git e editores
+.git/
+.gitignore
+.gitattributes
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.log
+
+# Segredos — passe as variáveis reais em runtime (`docker run -e` / plataforma)
+.env
+.env.*
+!.env.example
+
+# Docker
+Dockerfile*
+.dockerignore
+compose.yaml
+compose.yml
+docker-compose*.yaml
+docker-compose*.yml
+
+# Docs e tarefas locais
+*.md
+docs/
+tasks/
+
+# CI
+.github/
+.gitlab-ci.yml
+
+# Cache e temporários
+.cache/
+.swc/
+.turbo/
+.tmp/
+.temp/
+*.tsbuildinfo
+
+# SO e ferramentas de IA
+.DS_Store
+.cursor/
+.claude
+AGENTS.md
+CLAUDE.md
